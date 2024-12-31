@@ -1,6 +1,7 @@
 pub mod hittable_list;
+pub mod camera;
 pub mod sphere;
-pub mod color;
-pub mod ray;
 
 mod hittable;
+mod color;
+mod ray;
