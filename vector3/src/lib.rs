@@ -12,7 +12,11 @@ pub type Point3 = Vec3;
 
 impl Vec3 {
     pub fn zero() -> Self {
-        Self(na::Vector3::new(0., 0., 0.))
+        Self::new(0., 0., 0.)
+    }
+
+    pub fn one() -> Self {
+        Self::new(1., 1., 1.)
     }
 
     pub fn new(x: f64, y: f64, z: f64) -> Self {
@@ -220,11 +224,13 @@ mod tests {
 
     #[test]
     fn test_new() {
-        let v = Vec3::zero();
-        assert_eq!(v.0, na::Vector3::new(0., 0., 0.));
+        assert_eq!(Vec3::new(1., 2., 3.).0, na::Vector3::new(1., 2., 3.));
+        assert_eq!(Vec3::zero(), Vec3::new(0., 0., 0.));
+        assert_eq!(Vec3::one(), Vec3::new(1., 1., 1.));
 
-        let v = Vec3::new(1., 2., 3.);
-        assert_eq!(v.0, na::Vector3::new(1., 2., 3.));
+        assert_eq!(Vec3::from_x(5.), Vec3::new(5., 0., 0.));
+        assert_eq!(Vec3::from_y(5.), Vec3::new(0., 5., 0.));
+        assert_eq!(Vec3::from_z(5.), Vec3::new(0., 0., 5.));
 
         let v = Vec3::from_nalgebra(na::Vector3::new(1., 2., 3.));
         assert_eq!(v, Vec3::new(1., 2., 3.));
@@ -292,6 +298,7 @@ mod tests {
         let v1 = Vec3::new(1., 2., 3.);
         let v2 = Vec3::new(4., 5., 6.);
         assert_eq!(v1.dot(&v2), v1.to_nalgebra().dot(&v2.to_nalgebra()));
+        assert_eq!(v1.dot_self(), v1.dot(&v1));
     }
 
     #[test]
@@ -302,6 +309,7 @@ mod tests {
             v1.cross(&v2),
             Vec3::from_nalgebra(v1.to_nalgebra().cross(&v2.to_nalgebra()))
         );
+        assert_eq!(v1.cross_self(), v1.cross(&v1));
     }
 
     #[test]
@@ -318,6 +326,7 @@ mod tests {
         assert_eq!(v, v1.unscale_from_vec3(&v));
         let v2 = v.scale(2.);
         assert_eq!(v, v2.unscale(2.));
+        assert_eq!(v.unit(), v.scale_to_vec3(&v));
     }
 
     #[test]

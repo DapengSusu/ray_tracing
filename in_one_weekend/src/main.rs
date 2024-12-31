@@ -1,25 +1,17 @@
-use in_one_weekend::{color::*, ray::Ray};
+use std::rc::Rc;
+use in_one_weekend::{color::*, hittable_list::HittableList, ray::Ray, sphere::Sphere};
 use vector3::{Point3, Vec3};
 
 fn main() {
     generate_image();
 }
 
-fn hit_sphere(center: &Point3, radius: f64, ray: &Ray) -> bool {
-    let oc = *center - *ray.origin();
-    let a = ray.direction().dot_self();
-    let b = -2. * ray.direction().dot(&oc);
-    let c= oc.dot_self() - radius * radius;
-
-    b*b - 4.*a*c >= 0.
-}
-
-fn ray_color(ray: &Ray) -> Color {
-    if hit_sphere(&Point3::from_z(-1.), 0.5, ray) {
-        return Color::from_x(1.);
+fn ray_color(ray: &Ray, world: &HittableList) -> Color {
+    if let Some(hit_record) = world.hit(ray, 0., f64::INFINITY) {
+        return 0.5 * (hit_record.normal + Color::one());
     }
     let t = 0.5 * (ray.direction().unit().y() + 1.);
-    (1. - t) * Color::new(1., 1., 1.) + t * Color::new(0.5, 0.7, 1.)
+    (1. - t)*Color::one() + t*Color::new(0.5, 0.7, 1.)
 }
 
 fn generate_image() {
@@ -28,6 +20,11 @@ fn generate_image() {
     // Calculate the image height, and ensure that it's at least 1.
     const IMAGE_WIDTH: u32 = 400;
     const IMAGE_HEIGHT: u32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as u32;
+
+    // World
+    let mut world = HittableList::new();
+    world.add(Rc::new(Sphere::new(Point3::from_z(-1.), 0.5)));
+    world.add(Rc::new(Sphere::new(Point3::new(0., -100.5, -1.), 100.)));
 
     // Camera
     const FOCAL_LENGTH: f64 = 1.;
@@ -57,7 +54,7 @@ fn generate_image() {
                 + i as f64 * pixel_delta_u + j as f64 * pixel_delta_v;
             let ray_direction = pixel_center - camera_center;
             let ray = Ray::new(camera_center, ray_direction);
-            let pixel_color = ray_color(&ray);
+            let pixel_color = ray_color(&ray, &world);
 
             write_color(&pixel_color);
         }
