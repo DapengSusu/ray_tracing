@@ -47,6 +47,12 @@ impl Vec3 {
         self.0.z
     }
 
+    pub fn set(&mut self, x: f64, y: f64, z: f64) {
+        self.0.x = x;
+        self.0.y = y;
+        self.0.z = z;
+    }
+
     pub fn set_x(&mut self, x: f64) {
         self.0.x = x;
     }
@@ -59,16 +65,20 @@ impl Vec3 {
         self.0.z = z;
     }
 
-    pub fn sub(self, rhs: &Self) -> Self {
-        Self(self.0 - rhs.0)
-    }
-
     pub fn dot(&self, rhs: &Self) -> f64 {
         self.0.dot(&rhs.0)
     }
 
+    pub fn dot_self(&self) -> f64 {
+        self.dot(self)
+    }
+
     pub fn cross(&self, rhs: &Self) -> Self {
         Self(self.0.cross(&rhs.0))
+    }
+
+    pub fn cross_self(&self) -> Self {
+        self.cross(self)
     }
 
     pub fn scale(&self, rhs: f64) -> Self {

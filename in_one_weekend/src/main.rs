@@ -5,7 +5,19 @@ fn main() {
     generate_image();
 }
 
+fn hit_sphere(center: &Point3, radius: f64, ray: &Ray) -> bool {
+    let oc = *center - *ray.origin();
+    let a = ray.direction().dot_self();
+    let b = -2. * ray.direction().dot(&oc);
+    let c= oc.dot_self() - radius * radius;
+
+    b*b - 4.*a*c >= 0.
+}
+
 fn ray_color(ray: &Ray) -> Color {
+    if hit_sphere(&Point3::from_z(-1.), 0.5, ray) {
+        return Color::from_x(1.);
+    }
     let t = 0.5 * (ray.direction().unit().y() + 1.);
     (1. - t) * Color::new(1., 1., 1.) + t * Color::new(0.5, 0.7, 1.)
 }
