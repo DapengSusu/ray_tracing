@@ -1,3 +1,5 @@
+use in_one_weekend::color::*;
+
 fn main() {
     generate_image();
 }
@@ -13,12 +15,9 @@ fn generate_image() {
             let r = i as f64 / (IMAGE_WIDTH - 1) as f64;
             let g = j as f64 / (IMAGE_HEIGHT - 1) as f64;
             let b = 0.;
+            let pixel_color = Color::new(r, g, b);
 
-            let r = (255.999 * r) as u32;
-            let g = (255.999 * g) as u32;
-            let b = (255.999 * b) as u32;
-
-            print!("{r} {g} {b}\n");
+            write_color(&pixel_color);
         }
     }
     eprint!("\r{:<30}\n", "Down.");

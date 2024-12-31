@@ -1,4 +1,7 @@
-use std::{fmt::Debug, ops::{Add, AddAssign, Sub, SubAssign, Neg}};
+use std::{
+    fmt::{Debug, Display},
+    ops::{Add, AddAssign, Neg, Sub, SubAssign}
+};
 
 extern crate nalgebra as na;
 
@@ -80,6 +83,12 @@ impl Vec3 {
 
     pub fn to_nalgebra(&self) -> na::Vector3<f64> {
         self.mtx
+    }
+}
+
+impl Display for Vec3 {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{} {} {})", self.x(), self.y(), self.z())
     }
 }
 
