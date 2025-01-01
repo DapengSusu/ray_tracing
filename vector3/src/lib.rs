@@ -16,31 +16,85 @@ pub struct Vec3 {
 pub type Point3 = Vec3;
 
 impl Vec3 {
+    /// 零向量
+    /// 等价于 `Vec3::new(0., 0., 0.)`
+    /// ```
+    /// use vector3::Vec3;
+    /// let v = Vec3::zero();
+    /// assert_eq!(v.x, 0.);
+    /// assert_eq!(v.y, 0.);
+    /// assert_eq!(v.z, 0.);
+    /// ```
     pub fn zero() -> Self {
         Self::new(0., 0., 0.)
     }
 
+    /// 单位向量
+    /// 等价于 `Vec3::new(1., 1., 1.)`
+    /// ```
+    /// use vector3::Vec3;
+    /// let v = Vec3::one();
+    /// assert_eq!(v.x, 1.);
+    /// assert_eq!(v.y, 1.);
+    /// assert_eq!(v.z, 1.);
+    /// ```
     pub fn one() -> Self {
         Self::new(1., 1., 1.)
     }
 
+    /// 构造向量
+    /// # Examples
+    /// ```
+    /// use vector3::Vec3;
+    /// let v = Vec3::new(1., 2., 3.);
+    /// assert_eq!(v.x, 1.);
+    /// assert_eq!(v.y, 2.);
+    /// assert_eq!(v.z, 3.);
+    /// ```
     pub fn new(x: f64, y: f64, z: f64) -> Self {
         Self { x, y, z }
     }
 
+    /// 从x轴构造向量
+    /// 等价于 `Vec3::new(x, 0., 0.)`
+    /// ```
+    /// use vector3::Vec3;
+    /// let v = Vec3::from_x(1.);
+    /// assert_eq!(v.x, 1.);
+    /// assert_eq!(v.y, 0.);
+    /// assert_eq!(v.z, 0.);
+    /// ```
     pub fn from_x(x: f64) -> Self {
         Self::new(x, 0., 0.)
     }
 
+    /// 从y轴构造向量
+    /// 等价于 `Vec3::new(0., y, 0.)`
+    /// ```
+    /// use vector3::Vec3;
+    /// let v = Vec3::from_y(1.);
+    /// assert_eq!(v.x, 0.);
+    /// assert_eq!(v.y, 1.);
+    /// assert_eq!(v.z, 0.);
+    /// ```
     pub fn from_y(y: f64) -> Self {
         Self::new(0., y, 0.)
     }
 
+    /// 从z轴构造向量
+    /// 等价于 `Vec3::new(0., 0., z)`
+    /// ```
+    /// use vector3::Vec3;
+    /// let v = Vec3::from_z(1.);
+    /// assert_eq!(v.x, 0.);
+    /// assert_eq!(v.y, 0.);
+    /// assert_eq!(v.z, 1.);
+    /// ```
     pub fn from_z(z: f64) -> Self {
         Self::new(0., 0., z)
     }
 
-    /// 随机向量
+    /// 随机向量，范围[0, 1)
     pub fn random() -> Self {
         Self::new(
             rtweekend::random(),
@@ -60,16 +114,35 @@ impl Vec3 {
 
     /// 向量点积
     /// `x1*x2 + y1*y2 + z1*z2`
+    /// ```
+    /// use vector3::Vec3;
+    /// let v1 = Vec3::new(1., 2., 3.);
+    /// let v2 = Vec3::new(4., 5., 6.);
+    /// assert_eq!(v1.dot(&v2), 32.);
+    /// ```
     pub fn dot(&self, rhs: &Self) -> f64 {
         self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
     }
 
+    /// 与自身点积
+    /// `x*x + y*y + z*z`
+    /// ```
+    /// use vector3::Vec3;
+    /// let v = Vec3::new(1., 2., 3.);
+    /// assert_eq!(v.dot_self(), 14.);
+    /// ```
     pub fn dot_self(&self) -> f64 {
         self.dot(self)
     }
 
     /// 向量叉积
     /// `(y1*z2 - z1*y2, z1*x2 - x1*z2, x1*y2 - y1*x2)`
+    /// ```
+    /// use vector3::Vec3;
+    /// let v1 = Vec3::new(1., 2., 3.);
+    /// let v2 = Vec3::new(4., 5., 6.);
+    /// assert_eq!(v1.cross(&v2), Vec3::new(-3., 6., -3.));
+    /// ```
     pub fn cross(&self, rhs: &Self) -> Self {
         Self {
             x: self.y * rhs.z - self.z * rhs.y,
@@ -78,11 +151,12 @@ impl Vec3 {
         }
     }
 
-    pub fn cross_self(&self) -> Self {
-        self.cross(self)
-    }
-
     /// 归一化，单位向量
+    /// ```
+    /// use vector3::Vec3;
+    /// let v = Vec3::new(1., 2., 3.);
+    /// assert_eq!(v.normalize().norm(), 1.);
+    /// ```
     pub fn normalize(&self) -> Self {
         *self / self.norm()
     }
@@ -99,9 +173,28 @@ impl Vec3 {
         self.squared().sqrt()
     }
 
+    /// 判断向量是否接近零
+    /// ```
+    /// use vector3::Vec3;
+    /// let v = Vec3::new(1e-9, 1e-9, 1e-9);
+    /// assert!(v.near_zero());
+    /// let v = Vec3::new(1e-8, 1e-8, 1e-8);
+    /// assert!(v.near_zero() == false);
+    /// ```
     pub fn near_zero(&self) -> bool {
         // Return true if the vector is close to zero in all dimensions.
         self.x < 1e-8 && self.y < 1e-8 && self.z < 1e-8
+    }
+
+    /// 向量元素和
+    /// `x + y + z`
+    /// ```
+    /// use vector3::Vec3;
+    /// let v = Vec3::new(1., 2., 3.);
+    /// assert_eq!(v.sum(), 6.);
+    /// ```
+    pub fn sum(&self) -> f64 {
+        self.x + self.y + self.z
     }
 }
 
@@ -167,6 +260,18 @@ impl SubAssign for Vec3 {
     }
 }
 
+impl Mul for Vec3 {
+    type Output = Self;
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        Self {
+            x: self.x * rhs.x,
+            y: self.y * rhs.y,
+            z: self.z * rhs.z
+        }
+    }
+}
+
 impl Mul<f64> for Vec3 {
     type Output = Self;
 
@@ -188,6 +293,18 @@ impl Mul<Vec3> for f64 {
             self * rhs.y,
             self * rhs.z
         )
+    }
+}
+
+impl Div for Vec3 {
+    type Output = Self;
+
+    fn div(self, rhs: Self) -> Self::Output {
+        Self {
+            x: self.x / rhs.x,
+            y: self.y / rhs.y,
+            z: self.z / rhs.z
+        }
     }
 }
 
@@ -279,24 +396,26 @@ mod tests {
         let v = Vec3::new(1., 2., 3.);
         assert_eq!(v * 2., Vec3::new(2., 4., 6.));
         assert_eq!(4. * v, Vec3::new(4., 8., 12.));
+
+        let v1 = Vec3::new(1., 3., 5.);
+        let v2 = Vec3::new(2., 4., 6.);
+        assert_eq!(v1 * v2, Vec3::new(2., 12., 30.));
     }
 
     #[test]
     fn test_div() {
         let v = Vec3::new(9., 18., 27.);
         assert_eq!(v / 3., Vec3::new(3., 6., 9.));
+
+        let v1 = Vec3::new(3., 9., 15.);
+        let v2 = Vec3::new(1., 3., 5.);
+        assert_eq!(v1 / v2, Vec3::new(3., 3., 3.));
     }
 
     #[test]
     fn test_dot() {
         let v = Vec3::new(1., 2., 3.);
         assert_eq!(v.dot_self(), v.dot(&v));
-    }
-
-    #[test]
-    fn test_cross() {
-        let v = Vec3::new(1., 2., 3.);
-        assert_eq!(v.cross_self(), v.cross(&v));
     }
 
     #[test]

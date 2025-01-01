@@ -5,7 +5,3 @@ edition = "2021"
 
 [dependencies]
 utils = { path = "../utils" }
-
-[[example]]
-name = "test_nalgebra"
-path = "examples/test_nalgebra.rs"

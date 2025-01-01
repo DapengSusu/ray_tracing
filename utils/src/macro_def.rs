@@ -1,3 +1,4 @@
+/// 检查两个浮点数是否相等
 #[macro_export]
 macro_rules! check_f64_eq {
     ($left:expr, $right:expr $(,)?) => {
@@ -5,6 +6,7 @@ macro_rules! check_f64_eq {
     };
 }
 
+/// 断言两个浮点数相等
 #[macro_export]
 macro_rules! assert_f64_eq {
     ($left:expr, $right:expr $(,)?) => {
@@ -14,6 +16,7 @@ macro_rules! assert_f64_eq {
     };
 }
 
+/// 断言两个浮点数不相等
 #[macro_export]
 macro_rules! assert_f64_ne {
     ($left:expr, $right:expr $(,)?) => {

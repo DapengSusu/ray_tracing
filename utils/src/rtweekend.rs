@@ -2,24 +2,20 @@ use rand::prelude::*;
 
 pub const PI: f64 = std::f64::consts::PI;
 pub type Degree = f64;
+pub type Radian = f64;
 
-#[allow(dead_code)] // todo: remove
-trait FromDegree {
-    fn to_radian(self) -> Self;
+/// 角度转弧度，180° = π
+pub fn degree_to_radian(degree: Degree) -> Radian {
+    degree * PI / 180.
 }
 
-impl FromDegree for Degree {
-    fn to_radian(self) -> Self {
-        self * PI / 180.
-    }
-}
-
+/// 随机数，范围[0, 1)
 pub fn random() -> f64 {
-    let mut rng = rand::thread_rng();
     // random number in range [0, 1)
-    rng.gen()
+    random_range(0., 1.)
 }
 
+/// 随机数，范围[min, max)
 pub fn random_range(min: f64, max: f64) -> f64 {
     let mut rng = rand::thread_rng();
     rng.gen_range(min..max)
@@ -32,7 +28,7 @@ mod tests {
 
     #[test]
     fn test_degree() {
-        assert_f64_eq!(PI, 180.0.to_radian());
+        assert_f64_eq!(PI, degree_to_radian(180.));
     }
 
     #[test]

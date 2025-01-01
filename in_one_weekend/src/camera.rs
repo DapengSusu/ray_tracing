@@ -11,14 +11,14 @@ pub struct Camera {
     // Ratio of image width over height
     pub aspect_ratio: f64,
     // Rendered image width in pixel count
-    pub image_width: u32,
+    pub image_width: i32,
     // Count of random samples for each pixel
-    pub samples_per_pixel : u32,
+    pub samples_per_pixel : i32,
     // Maximum number of ray bounces into scene
-    pub max_depth: u32,
+    pub max_depth: i32,
 
     // Rendered image height
-    image_height: u32,
+    image_height: i32,
     // Color scale factor for a sum of pixel samples
     pixel_samples_scale: f64,
     // Camera center
@@ -34,9 +34,9 @@ pub struct Camera {
 impl Camera {
     pub fn new(
             aspect_ratio: f64,
-            image_width: u32,
-            samples_per_pixel: u32,
-            max_depth: u32
+            image_width: i32,
+            samples_per_pixel: i32,
+            max_depth: i32
         ) -> Self {
         let mut camera = Self::default();
 
@@ -44,12 +44,8 @@ impl Camera {
         camera.image_width = image_width;
         camera.samples_per_pixel = samples_per_pixel;
         camera.max_depth = max_depth;
-        camera.image_height = (image_width as f64 / aspect_ratio) as u32;
-        camera.image_height = if camera.image_height < 1 {
-            1
-        } else {
-            camera.image_height
-        };
+        camera.image_height = (image_width as f64 / aspect_ratio) as i32;
+        camera.image_height = camera.image_height.max(1);
 
         camera.pixel_samples_scale = 1. / (samples_per_pixel as f64);
 
@@ -95,7 +91,7 @@ impl Camera {
 
     // Construct a camera ray originating from the origin and directed at randomly sampled
     // point around the pixel location i, j.
-    fn ray(&self, i: u32, j: u32) ->Ray {
+    fn ray(&self, i: i32, j: i32) ->Ray {
         let offset = self.sample_square();
         let pixel_sample = self.pixel00_loc
             + (i as f64 + offset.x) * self.pixel_delta_u
@@ -109,14 +105,14 @@ impl Camera {
         Vec3::new(random() - 0.5, random() - 0.5, 0.)
     }
 
-    fn ray_color(&self, ray: Ray, depth: u32, world: &HittableList) -> Color {
+    fn ray_color(&self, ray: Ray, depth: i32, world: &HittableList) -> Color {
         // If we've exceeded the ray bounce limit, no more light is gathered.
         if depth <= 0 {
             return Color::zero();
         }
         if let Some(hit_record) = world.hit(&ray, Interval::new(0.001, f64::INFINITY)) {
-            if let Some((ray, color)) = hit_record.material.scatter(&ray, &hit_record) {
-                return self.ray_color(ray, depth-1, world).cross(&color);
+            if let Some((scattered, attenuation)) = hit_record.material.scatter(&ray, &hit_record) {
+                return attenuation * self.ray_color(scattered, depth-1, world);
             }
             return Color::zero();
         }

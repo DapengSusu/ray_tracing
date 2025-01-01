@@ -1,5 +1,8 @@
 use vector3::{Point3, Vec3};
 
+/// ## A ray in 3D space.
+/// **Origin** is the starting point of the ray.
+/// **Direction** is the direction of the ray.
 #[derive(Default)]
 pub struct Ray {
     origin: Point3,

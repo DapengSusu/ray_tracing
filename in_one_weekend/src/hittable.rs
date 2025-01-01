@@ -8,6 +8,7 @@ pub trait Hittable {
     fn hit(&self, ray: &Ray, ray_t: Interval) -> Option<HitRecord>;
 }
 
+#[derive(Clone)]
 pub struct HitRecord {
     pub point: Point3,
     pub normal: Vec3,

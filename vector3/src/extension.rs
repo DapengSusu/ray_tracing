@@ -5,7 +5,7 @@ pub fn random_unit_vector() -> Vec3 {
         let p = Vec3::random_range(-1., 1.);
         let sq = p.squared();
         if 1e-160 < sq && sq < 1. {
-            return p / f64::sqrt(sq);
+            return p / sq.sqrt();
         }
     }
 }

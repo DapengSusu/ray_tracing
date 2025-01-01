@@ -12,7 +12,7 @@ pub struct Sphere {
 
 impl Sphere {
     pub fn new(center: Point3, radius: f64, material: Rc<dyn Material>) -> Self {
-        Sphere { center, radius, material }
+        Sphere { center, radius: radius.max(0.), material }
     }
 }
 
@@ -21,7 +21,8 @@ impl Hittable for Sphere {
         let oc = self.center - *ray.origin();
         let a = ray.direction().squared();
         let h = ray.direction().dot(&oc);
-        let c = oc.squared() - self.radius.powi(2);
+        let c = oc.squared() - self.radius*self.radius;
+
         let disc = h*h - a*c;
         if disc < 0. {
             return None;
@@ -36,12 +37,13 @@ impl Hittable for Sphere {
                 return None;
             }
         }
+
         let mut hit_record = HitRecord::new();
         hit_record.t = root;
         hit_record.point = ray.at(root);
         let outward_normal = (hit_record.point - self.center) / self.radius;
         hit_record.set_face_normal(ray, outward_normal);
-        hit_record.material = Rc::clone(&self.material);
+        hit_record.material = self.material.clone();
 
         Some(hit_record)
     }
