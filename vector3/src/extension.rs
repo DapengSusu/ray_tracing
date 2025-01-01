@@ -1,3 +1,4 @@
+use utils::rtweekend::random_range;
 use crate::Vec3;
 
 pub fn cos_theta(uv: &Vec3, n: &Vec3) -> f64 {
@@ -10,6 +11,19 @@ pub fn random_unit_vector() -> Vec3 {
         let sq = p.squared();
         if 1e-160 < sq && sq < 1. {
             return p / sq.sqrt();
+        }
+    }
+}
+
+pub fn random_unit_disk() -> Vec3 {
+    loop {
+        let p = Vec3 {
+            x: random_range(-1., 1.),
+            y: random_range(-1., 1.),
+            z: 0.
+        };
+        if p.squared() < 1. {
+            return p;
         }
     }
 }

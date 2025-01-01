@@ -34,6 +34,8 @@ fn main() {
         20.,
         Point3::new(-2., 2., 1.),
         Point3::from_z(-1.),
-        Point3::from_y(1.)
+        Point3::from_y(1.),
+        10.,
+        3.4
     ).render(&world);
 }
