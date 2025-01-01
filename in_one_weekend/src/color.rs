@@ -19,8 +19,5 @@ pub fn write_color(pixel_color: Color) {
 }
 
 fn linear_to_gamma(linear_component: f64) -> f64 {
-    if linear_component > 0. {
-        return linear_component.sqrt();
-    }
-    0.
+    (linear_component > 0.).then(|| linear_component.sqrt()).unwrap_or(0.)
 }

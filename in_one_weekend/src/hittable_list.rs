@@ -19,7 +19,7 @@ impl HittableList {
     }
 
     pub fn hit(&self, ray: &Ray, ray_t: Interval) -> Option<HitRecord> {
-        let mut records = Vec::new();
+        let mut hit_record = HitRecord::default();
         let mut is_hit = false;
         let mut close_st = ray_t.max;
 
@@ -27,13 +27,10 @@ impl HittableList {
             if let Some(record) = hittable.hit(ray, Interval::new(ray_t.min, close_st)) {
                 is_hit = true;
                 close_st = record.t;
-                records.push(record);
+                hit_record = record;
             }
         });
 
-        if is_hit {
-            return Some(records.pop().unwrap());
-        }
-        None
+        is_hit.then(|| Some(hit_record)).unwrap_or(None)
     }
 }
