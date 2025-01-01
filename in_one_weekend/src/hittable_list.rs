@@ -2,7 +2,6 @@ use crate::{hittable::{HitRecord, Hittable}, ray::Ray};
 use utils::interval::Interval;
 use std::rc::Rc;
 
-
 pub struct HittableList(Vec<Rc<dyn Hittable>>);
 
 impl HittableList {

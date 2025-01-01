@@ -13,5 +13,9 @@ fn main() {
     world.add(Rc::new(Sphere::new(Point3::new(0., -100.5, -1.), 100.)));
 
     // Camera render
-    Camera::new(16./9., 400).render(&world);
+    Camera::new(
+        16./9.,
+        400,
+        100
+    ).render(&world);
 }

@@ -1,3 +1,4 @@
+// todo: 这里min和max的默认值是不是反了？
 pub const EMPTY: Interval = Interval { min: f64::INFINITY, max: f64::NEG_INFINITY };
 pub const UNIVERSE: Interval = Interval { min: f64::NEG_INFINITY, max: f64::INFINITY };
 
@@ -34,6 +35,7 @@ impl Interval {
     }
 }
 
+// todo: 这里min和max的默认值是不是反了？
 impl Default for Interval {
     fn default() -> Self {
         Self { min: f64::INFINITY, max: f64::NEG_INFINITY }

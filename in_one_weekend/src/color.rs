@@ -1,9 +1,18 @@
+use utils::interval::Interval;
+
 pub type Color = vector3::Vec3;
 
-pub fn write_color(pixel_color: &Color) {
-    let r = (255.999 * pixel_color.x()) as u32;
-    let g = (255.999 * pixel_color.y()) as u32;
-    let b = (255.999 * pixel_color.z()) as u32;
+pub fn write_color(pixel_color: Color) {
+    let r = pixel_color.x();
+    let g = pixel_color.y();
+    let b = pixel_color.z();
 
-    print!("{} {} {}\n", r, g, b);
+    // Translate the [0,1] component values to the byte range [0,255].
+    const INTERVAL: Interval = Interval { min: 0., max: 0.999 };
+    let r_byte = (INTERVAL.clamp(r) * 256.) as u32;
+    let g_byte = (INTERVAL.clamp(g) * 256.) as u32;
+    let b_byte = (INTERVAL.clamp(b) * 256.) as u32;
+
+    // Write out the pixel color components.
+    print!("{} {} {}\n", r_byte, g_byte, b_byte);
 }
