@@ -2,8 +2,10 @@ use std::{
     fmt::{Debug, Display},
     ops::{Add, AddAssign, Div, Mul, Neg, Sub, SubAssign}
 };
+use utils::rtweekend;
 
 extern crate nalgebra as na;
+pub mod extension;
 
 #[derive(Default, Clone, Copy)]
 pub struct Vec3(na::Vector3<f64>);
@@ -37,6 +39,22 @@ impl Vec3 {
 
     pub fn from_nalgebra(vec: na::Vector3<f64>) -> Self {
         Self(vec)
+    }
+
+    pub fn random() -> Self {
+        Self::new(
+            rtweekend::random(),
+            rtweekend::random(),
+            rtweekend::random()
+        )
+    }
+
+    pub fn random_range(min: f64, max: f64) -> Self {
+        Self::new(
+            rtweekend::random_range(min, max),
+            rtweekend::random_range(min, max),
+            rtweekend::random_range(min, max)
+        )
     }
 
     pub fn x(&self) -> f64 {

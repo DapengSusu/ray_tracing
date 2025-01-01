@@ -16,6 +16,7 @@ fn main() {
     Camera::new(
         16./9.,
         400,
-        100
+        100,
+        50
     ).render(&world);
 }

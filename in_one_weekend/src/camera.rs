@@ -4,7 +4,7 @@ use crate::{
     ray::Ray
 };
 use utils::{interval::Interval, rtweekend::random};
-use vector3::{Point3, Vec3};
+use vector3::{extension::random_unit_vector, Point3, Vec3};
 
 #[derive(Default)]
 pub struct Camera {
@@ -14,6 +14,8 @@ pub struct Camera {
     pub image_width: u32,
     // Count of random samples for each pixel
     pub samples_per_pixel : u32,
+    // Maximum number of ray bounces into scene
+    pub max_depth: u32,
 
     // Rendered image height
     image_height: u32,
@@ -33,13 +35,15 @@ impl Camera {
     pub fn new(
             aspect_ratio: f64,
             image_width: u32,
-            samples_per_pixel: u32
+            samples_per_pixel: u32,
+            max_depth: u32
         ) -> Self {
         let mut camera = Self::default();
 
         camera.aspect_ratio = aspect_ratio;
         camera.image_width = image_width;
         camera.samples_per_pixel = samples_per_pixel;
+        camera.max_depth = max_depth;
         camera.image_height = (image_width as f64 / aspect_ratio) as u32;
         camera.image_height = if camera.image_height < 1 {
             1
@@ -80,7 +84,7 @@ impl Camera {
             for i in 0..self.image_width {
                 let mut pixel_color = Color::zero();
                 for _ in 0..self.samples_per_pixel {
-                    pixel_color += self.ray_color(&self.ray(i, j), world);
+                    pixel_color += self.ray_color(self.ray(i, j), self.max_depth, world);
                 }
 
                 write_color(self.pixel_samples_scale * pixel_color);
@@ -105,9 +109,14 @@ impl Camera {
         Vec3::new(random() - 0.5, random() - 0.5, 0.)
     }
 
-    fn ray_color(&self, ray: &Ray, world: &HittableList) -> Color {
-        if let Some(hit_record) = world.hit(ray, Interval::new(0., f64::INFINITY)) {
-            return 0.5 * (hit_record.normal + Color::one());
+    fn ray_color(&self, ray: Ray, depth: u32, world: &HittableList) -> Color {
+        // If we've exceeded the ray bounce limit, no more light is gathered.
+        if depth <= 0 {
+            return Color::zero();
+        }
+        if let Some(hit_record) = world.hit(&ray, Interval::new(0.001, f64::INFINITY)) {
+            let direction = hit_record.normal + random_unit_vector();
+            return 0.5 * self.ray_color(Ray::new(hit_record.point, direction), depth-1, world)
         }
         let t = 0.5 * (ray.direction().unit().y() + 1.);
         (1. - t)*Color::one() + t*Color::new(0.5, 0.7, 1.)
