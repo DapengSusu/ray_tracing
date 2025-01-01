@@ -4,7 +4,7 @@ use crate::{
     ray::Ray
 };
 use utils::{interval::Interval, rtweekend::random};
-use vector3::{extension::random_unit_vector, Point3, Vec3};
+use vector3::{Point3, Vec3};
 
 #[derive(Default)]
 pub struct Camera {
@@ -115,8 +115,10 @@ impl Camera {
             return Color::zero();
         }
         if let Some(hit_record) = world.hit(&ray, Interval::new(0.001, f64::INFINITY)) {
-            let direction = hit_record.normal + random_unit_vector();
-            return 0.5 * self.ray_color(Ray::new(hit_record.point, direction), depth-1, world)
+            if let Some((ray, color)) = hit_record.material.scatter(&ray, &hit_record) {
+                return self.ray_color(ray, depth-1, world).cross(&color);
+            }
+            return Color::zero();
         }
         let t = 0.5 * (ray.direction().unit().y() + 1.);
         (1. - t)*Color::one() + t*Color::new(0.5, 0.7, 1.)

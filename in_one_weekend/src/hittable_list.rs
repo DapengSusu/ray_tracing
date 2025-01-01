@@ -18,7 +18,7 @@ impl HittableList {
     }
 
     pub fn hit(&self, ray: &Ray, ray_t: Interval) -> Option<HitRecord> {
-        let mut hit_record = HitRecord::default();
+        let mut hit_record = HitRecord::new();
         let mut is_hit = false;
         let mut close_st = ray_t.max;
 

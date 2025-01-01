@@ -1,6 +1,6 @@
 use vector3::{Point3, Vec3};
 
-#[derive(Default, Clone, Copy)]
+#[derive(Default)]
 pub struct Ray {
     origin: Point3,
     direction: Vec3

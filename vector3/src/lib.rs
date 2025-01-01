@@ -142,6 +142,11 @@ impl Vec3 {
     pub fn to_nalgebra(&self) -> na::Vector3<f64> {
         self.0
     }
+
+    pub fn near_zero(&self) -> bool {
+        // Return true if the vector is close to zero in all dimensions.
+        self.x() < 1e-8 && self.y() < 1e-8 && self.z() < 1e-8
+    }
 }
 
 impl Display for Vec3 {
