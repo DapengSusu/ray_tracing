@@ -4,9 +4,9 @@ pub type Color = vector3::Vec3;
 
 pub fn write_color(pixel_color: Color) {
     // Apply a linear to gamma transform for gamma 2
-    let r = linear_to_gamma(pixel_color.x());
-    let g = linear_to_gamma(pixel_color.y());
-    let b = linear_to_gamma(pixel_color.z());
+    let r = linear_to_gamma(pixel_color.x);
+    let g = linear_to_gamma(pixel_color.y);
+    let b = linear_to_gamma(pixel_color.z);
 
     // Translate the [0,1] component values to the byte range [0,255].
     const INTERVAL: Interval = Interval { min: 0., max: 0.999 };

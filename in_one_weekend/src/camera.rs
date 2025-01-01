@@ -98,8 +98,8 @@ impl Camera {
     fn ray(&self, i: u32, j: u32) ->Ray {
         let offset = self.sample_square();
         let pixel_sample = self.pixel00_loc
-            + (i as f64 + offset.x()) * self.pixel_delta_u
-            + (j as f64 + offset.y()) * self.pixel_delta_v;
+            + (i as f64 + offset.x) * self.pixel_delta_u
+            + (j as f64 + offset.y) * self.pixel_delta_v;
 
         Ray::new(self.center, pixel_sample - self.center)
     }
@@ -120,7 +120,7 @@ impl Camera {
             }
             return Color::zero();
         }
-        let t = 0.5 * (ray.direction().unit().y() + 1.);
+        let t = 0.5 * (ray.direction().normalize().y + 1.);
         (1. - t)*Color::one() + t*Color::new(0.5, 0.7, 1.)
     }
 }

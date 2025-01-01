@@ -4,11 +4,14 @@ use std::{
 };
 use utils::rtweekend;
 
-extern crate nalgebra as na;
 pub mod extension;
 
 #[derive(Default, Clone, Copy)]
-pub struct Vec3(na::Vector3<f64>);
+pub struct Vec3 {
+    pub x: f64,
+    pub y: f64,
+    pub z: f64
+}
 
 pub type Point3 = Vec3;
 
@@ -22,7 +25,7 @@ impl Vec3 {
     }
 
     pub fn new(x: f64, y: f64, z: f64) -> Self {
-        Self(na::Vector3::new(x, y, z))
+        Self { x, y, z }
     }
 
     pub fn from_x(x: f64) -> Self {
@@ -37,10 +40,7 @@ impl Vec3 {
         Self::new(0., 0., z)
     }
 
-    pub fn from_nalgebra(vec: na::Vector3<f64>) -> Self {
-        Self(vec)
-    }
-
+    /// 随机向量
     pub fn random() -> Self {
         Self::new(
             rtweekend::random(),
@@ -49,6 +49,7 @@ impl Vec3 {
         )
     }
 
+    /// 随机向量，范围[min, max]
     pub fn random_range(min: f64, max: f64) -> Self {
         Self::new(
             rtweekend::random_range(min, max),
@@ -57,115 +58,70 @@ impl Vec3 {
         )
     }
 
-    pub fn x(&self) -> f64 {
-        self.0.x
-    }
-
-    pub fn y(&self) -> f64 {
-        self.0.y
-    }
-
-    pub fn z(&self) -> f64 {
-        self.0.z
-    }
-
-    pub fn set(&mut self, x: f64, y: f64, z: f64) {
-        self.0.x = x;
-        self.0.y = y;
-        self.0.z = z;
-    }
-
-    pub fn set_x(&mut self, x: f64) {
-        self.0.x = x;
-    }
-
-    pub fn set_y(&mut self, y: f64) {
-        self.0.y = y;
-    }
-
-    pub fn set_z(&mut self, z: f64) {
-        self.0.z = z;
-    }
-
+    /// 向量点积
+    /// `x1*x2 + y1*y2 + z1*z2`
     pub fn dot(&self, rhs: &Self) -> f64 {
-        self.0.dot(&rhs.0)
+        self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
     }
 
     pub fn dot_self(&self) -> f64 {
         self.dot(self)
     }
 
+    /// 向量叉积
+    /// `(y1*z2 - z1*y2, z1*x2 - x1*z2, x1*y2 - y1*x2)`
     pub fn cross(&self, rhs: &Self) -> Self {
-        Self(self.0.cross(&rhs.0))
+        Self {
+            x: self.y * rhs.z - self.z * rhs.y,
+            y: self.z * rhs.x - self.x * rhs.z,
+            z: self.x * rhs.y - self.y * rhs.x
+        }
     }
 
     pub fn cross_self(&self) -> Self {
         self.cross(self)
     }
 
-    pub fn scale(&self, rhs: f64) -> Self {
-        Self(self.0.scale(rhs))
-    }
-
-    pub fn unscale(&self, rhs: f64) -> Self {
-        Self(self.0.unscale(rhs))
-    }
-
-    pub fn scale_to_vec3(&self, rhs: &Self) -> Self {
-        Self(self.0.scale(1. / rhs.norm()))
-    }
-
-    pub fn unscale_from_vec3(&self, rhs: &Self) -> Self {
-        Self(self.0.unscale(1. / rhs.norm()))
-    }
-
-    pub fn unit(&self) -> Self {
-        self.scale_to_vec3(self)
-    }
-
+    /// 归一化，单位向量
     pub fn normalize(&self) -> Self {
-        Self(self.0.normalize())
+        *self / self.norm()
     }
 
+    /// 向量模平方
+    /// `x*x + y*y + z*z`
     pub fn squared(&self) -> f64 {
-        self.0.norm_squared()
+        self.dot_self()
     }
 
-    pub fn magnitude(&self) -> f64 {
-        self.0.magnitude()
-    }
-
+    /// 向量长度（模）
+    /// `sqrt(x*x + y*y + z*z)`
     pub fn norm(&self) -> f64 {
-        self.0.norm()
-    }
-
-    pub fn to_nalgebra(&self) -> na::Vector3<f64> {
-        self.0
+        self.squared().sqrt()
     }
 
     pub fn near_zero(&self) -> bool {
         // Return true if the vector is close to zero in all dimensions.
-        self.x() < 1e-8 && self.y() < 1e-8 && self.z() < 1e-8
+        self.x < 1e-8 && self.y < 1e-8 && self.z < 1e-8
     }
 }
 
 impl Display for Vec3 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{} {} {}", self.x(), self.y(), self.z())
+        write!(f, "{} {} {}", self.x, self.y, self.z)
     }
 }
 
 impl Debug for Vec3 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Vec3({},{},{})", self.x(), self.y(), self.z())
+        write!(f, "Vec3({},{},{})", self.x, self.y, self.z)
     }
 }
 
 impl PartialEq for Vec3 {
     fn eq(&self, other: &Self) -> bool {
-        utils::check_f64_eq!(self.x(), other.x()) &&
-        utils::check_f64_eq!(self.y(), other.y()) &&
-        utils::check_f64_eq!(self.z(), other.z())
+        utils::check_f64_eq!(self.x, other.x) &&
+        utils::check_f64_eq!(self.y, other.y) &&
+        utils::check_f64_eq!(self.z, other.z)
     }
 }
 
@@ -175,13 +131,19 @@ impl Add for Vec3 {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self::Output {
-        Self(self.0 + rhs.0)
+        Self {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+            z: self.z + rhs.z
+        }
     }
 }
 
 impl AddAssign for Vec3 {
     fn add_assign(&mut self, rhs: Self) {
-        self.0 += rhs.0;
+        self.x += rhs.x;
+        self.y += rhs.y;
+        self.z += rhs.z;
     }
 }
 
@@ -189,13 +151,19 @@ impl Sub for Vec3 {
     type Output = Self;
 
     fn sub(self, rhs: Self) -> Self::Output {
-        Self(self.0 - rhs.0)
+        Self {
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
+            z: self.z - rhs.z
+        }
     }
 }
 
 impl SubAssign for Vec3 {
     fn sub_assign(&mut self, rhs: Self) {
-        self.0 -= rhs.0;
+        self.x -= rhs.x;
+        self.y -= rhs.y;
+        self.z -= rhs.z;
     }
 }
 
@@ -203,7 +171,11 @@ impl Mul<f64> for Vec3 {
     type Output = Self;
 
     fn mul(self, rhs: f64) -> Self::Output {
-        Self(self.0 * rhs)
+        Self {
+            x: self.x * rhs,
+            y: self.y * rhs,
+            z: self.z * rhs
+        }
     }
 }
 
@@ -212,9 +184,9 @@ impl Mul<Vec3> for f64 {
 
     fn mul(self, rhs: Vec3) -> Self::Output {
         Vec3::new(
-            self * rhs.x(),
-            self * rhs.y(),
-            self * rhs.z()
+            self * rhs.x,
+            self * rhs.y,
+            self * rhs.z
         )
     }
 }
@@ -223,7 +195,11 @@ impl Div<f64> for Vec3 {
     type Output = Self;
 
     fn div(self, rhs: f64) -> Self::Output {
-        Self(self.0 / rhs)
+        Self {
+            x: self.x / rhs,
+            y: self.y / rhs,
+            z: self.z / rhs
+        }
     }
 }
 
@@ -231,40 +207,36 @@ impl Neg for Vec3 {
     type Output = Self;
 
     fn neg(self) -> Self::Output {
-        Self(-self.0)
+        Self {
+            x: -self.x,
+            y: -self.y,
+            z: -self.z
+        }
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use utils::assert_f64_eq;
+
     use super::*;
 
     #[test]
-    fn test_to_nalgebra() {
-        let v = Vec3::new(1., 2., 3.);
-        assert_eq!(v.to_nalgebra(), na::Vector3::new(1., 2., 3.));
-    }
-
-    #[test]
     fn test_new() {
-        assert_eq!(Vec3::new(1., 2., 3.).0, na::Vector3::new(1., 2., 3.));
         assert_eq!(Vec3::zero(), Vec3::new(0., 0., 0.));
         assert_eq!(Vec3::one(), Vec3::new(1., 1., 1.));
 
         assert_eq!(Vec3::from_x(5.), Vec3::new(5., 0., 0.));
         assert_eq!(Vec3::from_y(5.), Vec3::new(0., 5., 0.));
         assert_eq!(Vec3::from_z(5.), Vec3::new(0., 0., 5.));
-
-        let v = Vec3::from_nalgebra(na::Vector3::new(1., 2., 3.));
-        assert_eq!(v, Vec3::new(1., 2., 3.));
     }
 
     #[test]
     fn test_axis() {
         let v = Vec3::new(1., 2., 3.);
-        utils::assert_f64_eq!(v.x(), 1.);
-        utils::assert_f64_eq!(v.y(), 2.);
-        utils::assert_f64_eq!(v.z(), 3.);
+        assert_f64_eq!(v.x, 1.);
+        assert_f64_eq!(v.y, 2.);
+        assert_f64_eq!(v.z, 3.);
     }
 
     #[test]
@@ -277,8 +249,7 @@ mod tests {
     #[test]
     fn test_neg() {
         let v = Vec3::new(1., 2., 3.);
-        let nv = -v;
-        assert_eq!(nv.0, na::Vector3::new(-1., -2., -3.));
+        assert_eq!(-v, Vec3::new(-1., -2., -3.));
     }
 
     #[test]
@@ -318,64 +289,19 @@ mod tests {
 
     #[test]
     fn test_dot() {
-        let v1 = Vec3::new(1., 2., 3.);
-        let v2 = Vec3::new(4., 5., 6.);
-        assert_eq!(v1.dot(&v2), v1.to_nalgebra().dot(&v2.to_nalgebra()));
-        assert_eq!(v1.dot_self(), v1.dot(&v1));
+        let v = Vec3::new(1., 2., 3.);
+        assert_eq!(v.dot_self(), v.dot(&v));
     }
 
     #[test]
     fn test_cross() {
-        let v1 = Vec3::new(1., 2., 3.);
-        let v2 = Vec3::new(4., 5., 6.);
-        assert_eq!(
-            v1.cross(&v2),
-            Vec3::from_nalgebra(v1.to_nalgebra().cross(&v2.to_nalgebra()))
-        );
-        assert_eq!(v1.cross_self(), v1.cross(&v1));
-    }
-
-    #[test]
-    fn test_scale() {
-        let v1 = Vec3::new(1., 2., 3.);
-        let v2 = Vec3::new(4., 5., 6.);
-        assert_eq!(
-            v1.scale_to_vec3(&v2).to_nalgebra(),
-            v1.to_nalgebra().scale(1. / &v2.to_nalgebra().magnitude())
-        );
-
-        let v = Vec3::new(4., 3., 2.);
-        let v1 = v.scale_to_vec3(&v);
-        assert_eq!(v, v1.unscale_from_vec3(&v));
-        let v2 = v.scale(2.);
-        assert_eq!(v, v2.unscale(2.));
-        assert_eq!(v.unit(), v.scale_to_vec3(&v));
+        let v = Vec3::new(1., 2., 3.);
+        assert_eq!(v.cross_self(), v.cross(&v));
     }
 
     #[test]
     fn test_normalize() {
         let v = Vec3::new(1., 2., 3.);
-        assert_eq!(
-            v.normalize(),
-            Vec3::from_nalgebra(v.to_nalgebra().normalize())
-        );
-    }
-
-    #[test]
-    fn test_squared() {
-        let v = Vec3::new(1., 2., 3.);
-        utils::assert_f64_eq!(v.squared(), v.to_nalgebra().norm_squared());
-    }
-
-    #[test]
-    fn test_magnitude() {
-        let v = Vec3::new(1., 2., 3.);
-        utils::assert_f64_eq!(v.magnitude(), v.to_nalgebra().magnitude());
-    }
-
-    #[test]
-    fn test_norm() {
-        let v = Vec3::new(1., 2., 3.);
-        utils::assert_f64_eq!(v.norm(), v.to_nalgebra().norm());
+        assert_f64_eq!(v.normalize().squared(), 1.);
     }
 }
