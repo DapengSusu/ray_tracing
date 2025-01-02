@@ -1,3 +1,6 @@
+#[global_allocator]
+static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
+
 use std::rc::Rc;
 
 use in_one_weekend::{
@@ -12,7 +15,7 @@ use vector3::Point3;
 
 fn main() {
     // World
-    let mut world = HittableList::new();
+    let mut world = HittableList::default();
 
     let ground_material = Rc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
     world.add(Rc::new(Sphere::new(Point3::from_y(-1000.), 1000., ground_material)));
@@ -43,8 +46,8 @@ fn main() {
 }
 
 fn generate_sphere_random(world: &mut HittableList) {
-    for j in -11..11 {
-        for i in -11..11 {
+    for j in -10..11 {
+        for i in -10..11 {
             let which_material = random();
             let center = Point3::new(
                 j as f64 + 0.9 * random(),
@@ -53,12 +56,12 @@ fn generate_sphere_random(world: &mut HittableList) {
             );
 
             if (center - Point3::new(4., 0.2, 0.)).norm() > 0.9 {
-                if which_material < 0.8 {
+                if which_material < 0.6 {
                     // diffuse
                     let albedo = Color::random() * Color::random();
                     let material = Rc::new(Lambertian::new(albedo));
                     world.add(Rc::new(Sphere::new(center, 0.2, material)));
-                } else if which_material < 0.95 {
+                } else if which_material < 0.85 {
                     // metal
                     let albedo = Color::random_range(0.5, 1.);
                     let fuzz = random_range(0., 0.5);

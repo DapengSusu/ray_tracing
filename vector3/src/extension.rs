@@ -32,7 +32,11 @@ pub fn random_on_hemisphere(normal: &Vec3) -> Vec3 {
     let unit = random_unit_vector();
 
     // In the same hemisphere as the normal
-    (unit.dot(normal) > 0.).then(|| unit).unwrap_or(-unit)
+    if unit.dot(normal) > 0. {
+        unit
+    } else {
+        -unit
+    }
 }
 
 pub fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {

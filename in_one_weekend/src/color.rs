@@ -15,9 +15,13 @@ pub fn write_color(pixel_color: Color) {
     let b_byte = (INTERVAL.clamp(b) * 256.) as i32;
 
     // Write out the pixel color components.
-    print!("{} {} {}\n", r_byte, g_byte, b_byte);
+    println!("{} {} {}", r_byte, g_byte, b_byte);
 }
 
 fn linear_to_gamma(linear_component: f64) -> f64 {
-    (linear_component > 0.).then(|| linear_component.sqrt()).unwrap_or(0.)
+    if linear_component > 0. {
+        linear_component.sqrt()
+    } else {
+        0.
+    }
 }

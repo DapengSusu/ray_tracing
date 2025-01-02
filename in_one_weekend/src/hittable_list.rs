@@ -3,13 +3,10 @@ use std::rc::Rc;
 use crate::{hittable::{HitRecord, Hittable}, ray::Ray};
 use utils::interval::Interval;
 
+#[derive(Default)]
 pub struct HittableList(Vec<Rc<dyn Hittable>>);
 
 impl HittableList {
-    pub fn new() -> Self {
-        Self(Vec::new())
-    }
-
     pub fn add(&mut self, hittable: Rc<dyn Hittable>) {
         self.0.push(hittable);
     }
@@ -31,6 +28,10 @@ impl HittableList {
             }
         });
 
-        is_hit.then(|| Some(hit_record)).unwrap_or(None)
+        if is_hit {
+            Some(hit_record)
+        } else {
+            None
+        }
     }
 }

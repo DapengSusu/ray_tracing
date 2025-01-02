@@ -120,19 +120,19 @@ impl Camera {
 
     pub fn render(&self, world: &HittableList) {
         // Render
-        print!("P3\n{} {}\n255\n", self.image_width, self.image_height);
+        println!("P3\n{} {}\n255", self.image_width, self.image_height);
         for j in 0..self.image_height {
             eprint!("\rScanlines remaining: {:<10}\r", self.image_height - j);
             for i in 0..self.image_width {
                 let mut pixel_color = Color::zero();
                 for _ in 0..self.samples_per_pixel {
-                    pixel_color += self.ray_color(self.ray(i, j), self.max_depth, world);
+                    pixel_color += Camera::ray_color(self.ray(i, j), self.max_depth, world);
                 }
 
                 write_color(self.pixel_samples_scale * pixel_color);
             }
         }
-        eprint!("\r{:<30}\n", "Down.");
+        eprintln!("\r{:<30}", "Down.");
     }
 
     fn ray(&self, i: i32, j: i32) ->Ray {
@@ -142,8 +142,11 @@ impl Camera {
         let pixel_sample = self.pixel00_loc
             + (i as f64 + offset.x) * self.pixel_delta_u
             + (j as f64 + offset.y) * self.pixel_delta_v;
-        let ray_origin = (self.defocus_angle <= 0.)
-            .then(|| self.center).unwrap_or(self.defocus_disk_sample());
+        let ray_origin = if self.defocus_angle <= 0. {
+            self.center
+        } else {
+            self.defocus_disk_sample()
+        };
         let ray_direction = pixel_sample - ray_origin;
 
         Ray::new(ray_origin, ray_direction)
@@ -160,14 +163,14 @@ impl Camera {
         self.center + p.x * self.defocus_disk_u + p.y * self.defocus_disk_v
     }
 
-    fn ray_color(&self, ray: Ray, depth: i32, world: &HittableList) -> Color {
+    fn ray_color(ray: Ray, depth: i32, world: &HittableList) -> Color {
         // If we've exceeded the ray bounce limit, no more light is gathered.
         if depth <= 0 {
             return Color::zero();
         }
         if let Some(hit_record) = world.hit(&ray, Interval::new(0.001, f64::INFINITY)) {
             if let Some((scattered, attenuation)) = hit_record.material.scatter(&ray, &hit_record) {
-                return attenuation * self.ray_color(scattered, depth-1, world);
+                return attenuation * Camera::ray_color(scattered, depth-1, world);
             }
             return Color::zero();
         }

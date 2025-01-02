@@ -22,9 +22,11 @@ impl HitRecord {
         // Sets the hit record normal vector.
         // NOTE: the parameter `outward_normal` is assumed to have unit length.
         self.front_face = ray.direction().dot(&outward_normal) < 0.;
-        self.normal = self.front_face
-            .then(|| outward_normal)
-            .unwrap_or(-outward_normal);
+        self.normal = if self.front_face {
+            outward_normal
+        } else {
+            -outward_normal
+        }
     }
 }
 
@@ -33,7 +35,7 @@ impl Default for HitRecord {
         Self {
             point: Point3::default(),
             normal: Vec3::default(),
-            material: Rc::new(DefaultMaterial::default()),
+            material: Rc::new(DefaultMaterial),
             t: 0.,
             front_face: false
         }

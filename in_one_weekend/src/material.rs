@@ -82,20 +82,22 @@ impl Dielectric {
 
 impl Material for Dielectric {
     fn scatter(&self, ray_in: &Ray, hit_record: &HitRecord) -> Option<(Ray, Color)> {
-        let ri = hit_record.front_face
-            .then(|| self.refraction_index.recip())
-            .unwrap_or(self.refraction_index);
+        let ri = if hit_record.front_face {
+            self.refraction_index.recip()
+        } else {
+            self.refraction_index
+        };
 
         let unit_direction = ray_in.direction().normalize();
         let cos_theta = cos_theta(&unit_direction, &hit_record.normal);
         let sin_theta = (1. - cos_theta.powi(2)).sqrt();
 
-        let direction = (ri * sin_theta > 1. ||
-            Dielectric::reflectance(cos_theta, ri) > random())
-            // 反射
-            .then(|| reflect(&unit_direction, &hit_record.normal))
-            // 折射
-            .unwrap_or(refract(&unit_direction, &hit_record.normal, ri));
+        let direction = if ri * sin_theta > 1. ||
+            Dielectric::reflectance(cos_theta, ri) > random() {
+            reflect(&unit_direction, &hit_record.normal) // 反射
+        } else {
+            refract(&unit_direction, &hit_record.normal, ri) // 折射
+        };
 
         Some((Ray::new(hit_record.point, direction), Color::one()))
     }
