@@ -16,22 +16,18 @@ impl HittableList {
     }
 
     pub fn hit(&self, ray: &Ray, ray_t: Interval) -> Option<HitRecord> {
-        let mut hit_record = HitRecord::default();
-        let mut is_hit = false;
         let mut close_st = ray_t.max;
 
-        self.0.iter().for_each(|hittable| {
+        // 使用filter_map来收集可能的结果
+        let hit_record = self.0.iter().filter_map(|hittable| {
             if let Some(record) = hittable.hit(ray, Interval::new(ray_t.min, close_st)) {
-                is_hit = true;
                 close_st = record.t;
-                hit_record = record;
+                Some(record)
+            } else {
+                None
             }
-        });
+        }).last(); // 取得最后一个结果
 
-        if is_hit {
-            Some(hit_record)
-        } else {
-            None
-        }
+        hit_record
     }
 }

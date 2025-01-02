@@ -56,12 +56,12 @@ fn generate_sphere_random(world: &mut HittableList) {
             );
 
             if (center - Point3::new(4., 0.2, 0.)).norm() > 0.9 {
-                if which_material < 0.6 {
+                if which_material < 0.7 {
                     // diffuse
                     let albedo = Color::random() * Color::random();
                     let material = Rc::new(Lambertian::new(albedo));
                     world.add(Rc::new(Sphere::new(center, 0.2, material)));
-                } else if which_material < 0.85 {
+                } else if which_material < 0.9 {
                     // metal
                     let albedo = Color::random_range(0.5, 1.);
                     let fuzz = random_range(0., 0.5);
