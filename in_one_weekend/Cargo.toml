@@ -6,3 +6,7 @@ edition = "2021"
 [dependencies]
 vector3 = { path = "../vector3" }
 utils = { path = "../utils" }
+
+[[bin]]
+name = "in_one_weekend"
+path = "src/main.rs"

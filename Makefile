@@ -10,10 +10,10 @@ check:
 build:
 	@cargo b $(MODE_ARG)
 
-run:
+run1:
 	@cargo r $(MODE_ARG) --bin in_one_weekend
 
 clean:
 	@cargo clean
 
-.PHONY: check build run clean
+.PHONY: check build run1 clean
