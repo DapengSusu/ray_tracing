@@ -1,6 +1,9 @@
-use utils::interval::Interval;
+use utils::interval::{self, Interval};
 use vector3::Point3;
 use crate::ray::Ray;
+
+pub const EMPTY: AABB = AABB { x: interval::EMPTY, y: interval::EMPTY, z: interval::EMPTY };
+pub const UNIVERSE: AABB = AABB { x: interval::UNIVERSE, y: interval::UNIVERSE, z: interval::UNIVERSE };
 
 /// Axis-Aligned Bounding Boxes (AABBs)
 /// 轴对齐边界框
@@ -67,5 +70,20 @@ impl AABB {
         }
 
         true
+    }
+
+    /// 返回包围盒最长轴的索引
+    /// x: 0
+    /// y: 1
+    /// z: 2
+    pub fn longest_axis(&self) -> usize {
+        let x_size = self.x.size();
+        let y_size = self.y.size();
+        let z_size = self.z.size();
+
+        let max_axis = [x_size, y_size, z_size].iter().enumerate()
+            .max_by(|a, b| a.1.partial_cmp(b.1).unwrap()).unwrap().0;
+
+        max_axis
     }
 }

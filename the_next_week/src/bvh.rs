@@ -1,7 +1,12 @@
 use std::rc::Rc;
 
-use crate::{aabb::AABB, hittable::{HitRecord, Hittable, InvalidHittable}, hittable_list::HittableList, ray::Ray};
-use utils::{interval::Interval, rtweekend::random_range};
+use crate::{
+    aabb::{self, AABB},
+    hittable::{HitRecord, Hittable, InvalidHittable},
+    hittable_list::HittableList,
+    ray::Ray
+};
+use utils::interval::Interval;
 
 pub struct BVHNode {
     left: Rc<dyn Hittable>,
@@ -18,6 +23,12 @@ impl BVHNode {
     pub fn new(objects: &mut Vec<Rc<dyn Hittable>>, begin: usize, end: usize) -> Self {
         let mut bvh_node = BVHNode::default();
 
+        // Build the bounding box of the span of source objects.
+        bvh_node.bbox = aabb::EMPTY;
+        for object_index in begin..end {
+            bvh_node.bbox = AABB::combine(&bvh_node.bbox, objects[object_index].bounding_box());
+        }
+
         let object_span = end - begin;
         match object_span {
             1 => {
@@ -29,8 +40,8 @@ impl BVHNode {
                 bvh_node.right = objects[begin + 1].clone();
             },
             _ => {
-                let axis = random_range(0, 3);
-                objects.sort_by(|a, b| {
+                let axis = bvh_node.bbox.longest_axis();
+                objects[begin..end].sort_by(|a, b| {
                     let a_axis_interval = a.bounding_box().axis_interval(axis);
                     let b_axis_interval = b.bounding_box().axis_interval(axis);
 
@@ -41,7 +52,6 @@ impl BVHNode {
                 bvh_node.right = Rc::new(BVHNode::new(objects, mid, end));
             }
         }
-        bvh_node.bbox = AABB::combine(bvh_node.left.bounding_box(), bvh_node.right.bounding_box());
 
         bvh_node
     }
