@@ -13,7 +13,7 @@ pub struct Sphere {
     center: Ray,
     radius: f64,
     material: Rc<dyn Material>,
-    bbox: AABB,
+    bbox: AABB
 }
 
 impl Sphere {
@@ -24,7 +24,7 @@ impl Sphere {
             center: Ray::new(center, Vec3::zero(), 0.),
             radius: radius.max(0.),
             material,
-            bbox: AABB::from_points(center - rvec, center + rvec),
+            bbox: AABB::from_points(center - rvec, center + rvec)
         }
     }
 

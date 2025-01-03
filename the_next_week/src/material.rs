@@ -1,6 +1,8 @@
-use crate::{color::Color, hittable::HitRecord, ray::Ray};
-use utils::rtweekend::random;
+use std::rc::Rc;
+
+use crate::{color::Color, hittable::HitRecord, ray::Ray, texture::{SolidColor, Texture}};
 use vector3::extension::{cos_theta, random_unit_vector, reflect, refract};
+use utils::rtweekend::random;
 
 pub trait Material {
     fn scatter(&self, ray_in: &Ray, hit_record: &HitRecord) -> Option<(Ray, Color)>;
@@ -15,14 +17,17 @@ impl Material for InvalidMaterial {
     }
 }
 
-#[derive(Default)]
 pub struct Lambertian {
-    albedo: Color
+    texture: Rc<dyn Texture>
 }
 
 impl Lambertian {
-    pub fn new(albedo: Color) -> Self {
-        Self { albedo }
+    pub fn new(texture: Rc<dyn Texture>) -> Self {
+        Self { texture }
+    }
+
+    pub fn from_color(albedo: Color) -> Self {
+        Self { texture: Rc::new(SolidColor::new(albedo)) }
     }
 }
 
@@ -35,7 +40,7 @@ impl Material for Lambertian {
             scatter_direction = hit_record.normal;
         }
         let scattered = Ray::new(hit_record.point, scatter_direction, ray_in.time());
-        let attenuation = self.albedo;
+        let attenuation = self.texture.value(hit_record.u, hit_record.v, &hit_record.point);
 
         Some((scattered, attenuation))
     }

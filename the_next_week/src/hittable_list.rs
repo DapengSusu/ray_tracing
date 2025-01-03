@@ -6,7 +6,7 @@ use utils::interval::Interval;
 #[derive(Default)]
 pub struct HittableList {
     pub objects: Vec<Rc<dyn Hittable>>,
-    bbox: AABB,
+    bbox: AABB
 }
 
 impl HittableList {

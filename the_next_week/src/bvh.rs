@@ -11,7 +11,7 @@ use utils::interval::Interval;
 pub struct BVHNode {
     left: Rc<dyn Hittable>,
     right: Rc<dyn Hittable>,
-    bbox: AABB,
+    bbox: AABB
 }
 
 impl BVHNode {
@@ -85,7 +85,7 @@ impl Default for BVHNode {
         Self {
             left: Rc::new(InvalidHittable),
             right: Rc::new(InvalidHittable),
-            bbox: AABB::default(),
+            bbox: AABB::default()
         }
     }
 }

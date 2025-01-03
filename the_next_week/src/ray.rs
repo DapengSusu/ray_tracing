@@ -5,7 +5,7 @@ use vector3::{Point3, Vec3};
 pub struct Ray {
     origin: Point3,
     direction: Vec3,
-    time: f64,
+    time: f64
 }
 
 impl Ray {
