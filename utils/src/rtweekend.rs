@@ -1,4 +1,4 @@
-use rand::prelude::*;
+use rand::{distributions::uniform::SampleUniform, prelude::*};
 
 pub const PI: f64 = std::f64::consts::PI;
 pub type Degree = f64;
@@ -10,13 +10,15 @@ pub fn degree_to_radian(degree: Degree) -> Radian {
 }
 
 /// 随机数，范围[0, 1)
-pub fn random() -> f64 {
+pub fn random<>() -> f64 {
     // random number in range [0, 1)
     random_range(0., 1.)
 }
 
 /// 随机数，范围[min, max)
-pub fn random_range(min: f64, max: f64) -> f64 {
+pub fn random_range<T>(min: T, max: T) -> T
+    where T: SampleUniform + PartialOrd
+{
     let mut rng = rand::thread_rng();
     rng.gen_range(min..max)
 }

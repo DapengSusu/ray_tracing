@@ -1,6 +1,6 @@
 use std::{
     fmt::{Debug, Display},
-    ops::{Add, AddAssign, Div, Mul, Neg, Sub, SubAssign}
+    ops::{Add, AddAssign, Div, Index, Mul, Neg, Sub, SubAssign}
 };
 use utils::rtweekend;
 
@@ -26,7 +26,7 @@ impl Vec3 {
     /// assert_eq!(v.z, 0.);
     /// ```
     pub fn zero() -> Self {
-        Self::new(0., 0., 0.)
+        Self::isotropic(0.)
     }
 
     /// 单位向量
@@ -39,7 +39,20 @@ impl Vec3 {
     /// assert_eq!(v.z, 1.);
     /// ```
     pub fn one() -> Self {
-        Self::new(1., 1., 1.)
+        Self::isotropic(1.)
+    }
+
+    /// 构造各分量相等的向量
+    /// 等价于 `Vec3::new(value, value, value)`
+    /// ```
+    /// use vector3::Vec3;
+    /// let v = Vec3::isotropic(1.);
+    /// assert_eq!(v.x, 1.);
+    /// assert_eq!(v.y, 1.);
+    /// assert_eq!(v.z, 1.);
+    /// ```
+    pub fn isotropic(value: f64) -> Self {
+        Self::new(value, value, value)
     }
 
     /// 构造向量
@@ -332,6 +345,19 @@ impl Neg for Vec3 {
     }
 }
 
+impl Index<usize> for Vec3 {
+    type Output = f64;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        match index {
+            0 => &self.x,
+            1 => &self.y,
+            2 => &self.z,
+            _ => panic!("Index out of bounds: {}", index)
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use utils::assert_f64_eq;
@@ -422,5 +448,13 @@ mod tests {
     fn test_normalize() {
         let v = Vec3::new(1., 2., 3.);
         assert_f64_eq!(v.normalize().squared(), 1.);
+    }
+
+    #[test]
+    fn test_index() {
+        let v = Vec3::new(1., 2., 3.);
+        assert_f64_eq!(v[0], 1.);
+        assert_f64_eq!(v[1], 2.);
+        assert_f64_eq!(v[2], 3.);
     }
 }

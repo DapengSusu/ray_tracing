@@ -2,11 +2,11 @@
 resolver = "2"
 members = [
     "in_one_weekend",
+    "the_next_week",
     "vector3",
     "utils"
 ]
 
 [profile.release]
 codegen-units = 1
-panic = "abort"
-lto = "fat"
+lto = true

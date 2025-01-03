@@ -13,7 +13,10 @@ build:
 run1:
 	@cargo r $(MODE_ARG) --bin in_one_weekend
 
+run2:
+	@cargo r $(MODE_ARG) --bin the_next_week
+
 clean:
 	@cargo clean
 
-.PHONY: check build run1 clean
+.PHONY: check build run1 run2 clean
