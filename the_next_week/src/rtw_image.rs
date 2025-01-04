@@ -1,11 +1,6 @@
-/// 使用RGB格式，每个像素3个字节
-const BYTES_PER_PIXEL: u32 = 3;
-
 #[derive(Default)]
 pub struct RTWImage {
     rgb_image: image::RgbImage,
-    /// 每行像素的字节数
-    bytes_per_scanline: u32,
     /// 图片宽度
     image_width: u32,
     /// 图片高度
@@ -23,7 +18,6 @@ impl RTWImage {
         self.rgb_image = image::open(image_filename).unwrap().to_rgb8();
 
         (self.image_width, self.image_height) = self.rgb_image.dimensions();
-        self.bytes_per_scanline = self.image_width * BYTES_PER_PIXEL;
         self.rgb_image.pixels().for_each(|pixel| {
             let rgb = image::Rgb([pixel.0[0], pixel.0[1], pixel.0[2]]);
             self.bdata.push(rgb.0);
