@@ -13,3 +13,7 @@ utils = { path = "../utils" }
 [[bin]]
 name = "the_next_week"
 path = "src/main.rs"
+
+[[example]]
+name = "test"
+path = "examples/test.rs"

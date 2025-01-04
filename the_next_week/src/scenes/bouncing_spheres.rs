@@ -1,5 +1,7 @@
 use std::rc::Rc;
 
+use utils::rtweekend::{random, random_range};
+use vector3::{Point3, Vec3};
 use crate::{
     bvh::BVHNode,
     camera::Camera,
@@ -9,8 +11,6 @@ use crate::{
     sphere::Sphere,
     texture::CheckerTexture
 };
-use utils::rtweekend::{random, random_range};
-use vector3::{Point3, Vec3};
 
 pub fn bouncing_spheres() {
     // World
@@ -51,7 +51,7 @@ pub fn bouncing_spheres() {
         20.,
         Point3::new(13., 2., 3.),
         Point3::zero(),
-        Point3::from_y(1.),
+        Vec3::from_y(1.),
         0.6,
         10.
     ).render(&world);

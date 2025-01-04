@@ -1,8 +1,13 @@
 use std::rc::Rc;
 
-use vector3::Point3;
-
-use crate::{camera::Camera, hittable_list::HittableList, material::Lambertian, sphere::Sphere, texture::ImageTexture};
+use vector3::{Point3, Vec3};
+use crate::{
+    camera::Camera,
+    hittable_list::HittableList,
+    material::Lambertian,
+    sphere::Sphere,
+    texture::ImageTexture
+};
 
 const IMAGE_FILENAME: &str = "the_next_week/asserts/earthmap.jpg";
 
@@ -15,7 +20,6 @@ pub fn earth() {
         earth_surface
     ));
 
-    // Camera render
     Camera::new(
         16./9.,
         400,
@@ -24,7 +28,7 @@ pub fn earth() {
         20.,
         Point3::from_z(12.),
         Point3::zero(),
-        Point3::from_y(1.),
+        Vec3::from_y(1.),
         0.,
         10.
     ).render(&HittableList::from_hittable(globe));

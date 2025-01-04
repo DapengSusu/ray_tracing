@@ -3,34 +3,30 @@ use std::rc::Rc;
 use vector3::{Point3, Vec3};
 use crate::{
     camera::Camera,
-    color::Color,
     hittable_list::HittableList,
     material::Lambertian,
     sphere::Sphere,
-    texture::CheckerTexture
+    texture::NoiseTexture
 };
 
-pub fn checkered_spheres() {
-    // World
+
+pub fn perlin_spheres() {
     let mut world = HittableList::default();
+    let perlin_texture = Rc::new(NoiseTexture::new());
+    let perlin_material = Rc::new(Lambertian::new(perlin_texture));
 
-    let checker = Rc::new(CheckerTexture::from_color(
-        0.32,
-        Color::new(0.2, 0.3, 0.1),
-        Color::isotropic(0.9)
-    ));
     world.add(Rc::new(Sphere::new_stationary_sphere(
-        Point3::from_y(-10.),
-        10.,
-        Rc::new(Lambertian::new(checker.clone()))
-    )));
-    world.add(Rc::new(Sphere::new_stationary_sphere(
-        Point3::from_y(10.),
-        10.,
-        Rc::new(Lambertian::new(checker.clone()))
+        Point3::from_y(-1000.),
+        1000.,
+        perlin_material.clone()
     )));
 
-    // Camera render
+    world.add(Rc::new(Sphere::new_stationary_sphere(
+        Point3::from_y(2.),
+        2.,
+        perlin_material
+    )));
+
     Camera::new(
         16./9.,
         400,
