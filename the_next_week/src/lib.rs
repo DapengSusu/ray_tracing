@@ -4,6 +4,7 @@ pub mod camera;
 pub mod sphere;
 pub mod color;
 
+pub mod rtw_image;
 pub mod texture;
 pub mod aabb;
 pub mod bvh;

@@ -1,6 +1,7 @@
 use std::rc::Rc;
 
-use crate::color::Color;
+use crate::{color::Color, rtw_image::RTWImage};
+use utils::interval::Interval;
 use vector3::Point3;
 
 pub trait Texture {
@@ -52,5 +53,36 @@ impl Texture for CheckerTexture {
         let is_even = (x_integer + y_integer + z_integer) % 2 == 0;
 
         if is_even { self.even.value(u, v, p) } else { self.odd.value(u, v, p) }
+    }
+}
+
+#[derive(Default)]
+pub struct ImageTexture {
+    image: RTWImage
+}
+
+impl ImageTexture {
+    pub fn new(image_filename: &str) -> Self {
+        Self { image: RTWImage::new(image_filename) }
+    }
+}
+
+impl Texture for ImageTexture {
+    fn value(&self, u: f64, v: f64, _p: &Point3) -> Color {
+        // If we have no texture data, then return solid cyan as a debugging aid.
+        if self.image.height() == 0 {
+            return Color::new(0., 1., 1.);
+        }
+        // Clamp input texture coordinates to [0,1] x [1,0]
+        let u = Interval::new(0., 1.).clamp(u);
+        // Flip V to image coordinates
+        let v = 1. - Interval::new(0., 1.).clamp(v);
+
+        let x = (u * self.image.width() as f64) as u32;
+        let y = (v * self.image.height() as f64) as u32;
+        let pixel = self.image.pixel_data(x, y);
+        let color_scale = (255.0_f64).recip();
+
+        Color::new(pixel[0] as f64, pixel[1] as f64, pixel[2] as f64) * color_scale
     }
 }

@@ -5,6 +5,8 @@ edition = "2021"
 
 [dependencies]
 mimalloc = "0.1"
+image = "0.25"
+
 vector3 = { path = "../vector3" }
 utils = { path = "../utils" }
 

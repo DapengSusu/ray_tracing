@@ -5,3 +5,12 @@ edition = "2021"
 
 [dependencies]
 rand = { version = "0.8", features = ["small_rng"] }
+
+[dev-dependencies]
+num-complex = "0.4"
+image = "0.25"
+anyhow = "1"
+
+[[example]]
+name = "test_image"
+path = "examples/test_image.rs"
